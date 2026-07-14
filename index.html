@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UnLoop - Your Custom Antidote</title>
+    <title>UnLoop - Learn, Laugh, Listen</title>
     <style>
         :root {
             --bg-color: #121214;
@@ -314,11 +314,11 @@
         <!-- SCREEN 1: Setup Phase / Onboarding Quiz -->
         <div id="screen-setup" class="screen active">
             <div class="setup-box">
-                <div class="setup-title">Step 1: Map Your Bubble</div>
-                <div class="setup-subtitle">Select the things you normally consume, watch, or listen to. UnLoop will use this profile to calculate and serve your exact physical and mental opposites.</div>
+                <div class="setup-title">Step 1: Establish Your Bubble</div>
+                <div class="setup-subtitle">Select the topics you normally default to on daily apps. UnLoop will build a tailored antidote menu containing exactly one new thing to Learn, one way to Laugh, and one thing to Listen to.</div>
                 
                 <div class="option-group">
-                    <span class="option-label">What is your music bubble?</span>
+                    <span class="option-label">What is your usual music loop?</span>
                     <div class="pill-grid" id="music-options">
                         <button class="pill" onclick="toggleSelection(this, 'prog_rock')">Prog Rock & Genesis</button>
                         <button class="pill" onclick="toggleSelection(this, 'electronic')">Ambient & Moby</button>
@@ -328,7 +328,7 @@
                 </div>
 
                 <div class="option-group">
-                    <span class="option-label">What is your entertainment bubble?</span>
+                    <span class="option-label">What is your typical entertainment loop?</span>
                     <div class="pill-grid" id="comedy-options">
                         <button class="pill" onclick="toggleSelection(this, 'uk_comedy')">UK Comedy Panel Shows</button>
                         <button class="pill" onclick="toggleSelection(this, 'tutorials')">Coding & Tech Tutorials</button>
@@ -369,20 +369,27 @@
         let isApiReady = false;
         
         let selectedPreferences = [];
-        let currentFlight = []; // Stores the 3 currently showing items
-        let remainingAntidotes = []; // Stores the rest of the pool to draw swaps from
+        let currentFlight = { learn: null, laugh: null, listen: null };
+        let remainingPool = { learn: [], laugh: [], listen: [] };
 
-        // MASTER VIDEO DATABASE - Curated Content Pool
-        const masterDatabase = [
-            { id: 0, tag: "Art Restoration", title: "Baumgartner Restoration", desc: "Slow, quiet, highly focused brush strokes restoring fine art. Perfect antidote to fast digital feeds.", videoId: "32SBBSNpwSE", category: "grounding" },
-            { id: 1, tag: "Nature Bushcraft", title: "My Self Reliance Cabins", desc: "Pure wood-chopping, snow, and construction in the Canadian wilderness. Quiet, tactile, physical loop-breaker.", videoId: "sG5fSCelTfQ", category: "grounding" },
-            { id: 2, tag: "Absurdist Humor", title: "Taskmaster Best Tasks", desc: "Intelligent but entirely unproductive British comedy. Playful thinking, the opposite of high-stress tutorials.", videoId: "v4YhsooE5xY", category: "creative_wit" },
-            { id: 3, tag: "Unusual Technology", title: "The Giant 1890s Orchestrion", desc: "Retro engineering at its absolute finest. Watch a self-playing musical room with physical instruments.", videoId: "L1eM9pYqS-Q", category: "retro_tech" },
-            { id: 4, tag: "Experimental Botany", title: "Mushroom Modular Synthesizer", desc: "Lush, synthesized drones programmed using bio-electrical signals of a forest oyster mushroom.", videoId: "916Iva8llvE", category: "retro_tech" },
-            { id: 5, tag: "Nature & Foraging", title: "Alleyway Foraging in London", desc: "Step outside to explore ancient wild medicine growing straight out of concrete sidewalk cracks.", videoId: "48B1_kY2sfI", category: "grounding" },
-            { id: 6, tag: "Toy Restoration", title: "Odd Tinkering Restoration", desc: "Slow-paced metal cleaning, screw tightening, and perfect manual repair of a vintage clockwork train.", videoId: "7t4KIYOipQM", category: "grounding" },
-            { id: 7, tag: "Macro Science", title: "Beautiful Chemistry Growth", desc: "A colorful, vibrant macro photography lens tracking stunning chemical precipitation.", videoId: "HSlQGFNstg0", category: "complex_visuals" }
-        ];
+        // CURATED DATABASE STRUCTERED DIRECTLY BY LEARN, LAUGH, LISTEN
+        const masterDatabase = {
+            learn: [
+                { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Explore physical engineering of the late 19th-century. Watch a massive mechanical music box play 20 acoustic instruments at once.", videoId: "L1eM9pYqS-Q" },
+                { id: 102, tag: "Learn", title: "Alleyway Foraging in London", desc: "Change how you walk through cities. Discover active medicinal and edible wild plants growing straight out of sidewalk cracks.", videoId: "48B1_kY2sfI" },
+                { id: 103, tag: "Learn", title: "Artisanal PSone Restoration", desc: "Relax as a vintage, broken plastic console is carefully taken apart, retro-brightened, and fully restored with classic tools.", videoId: "7t4KIYOipQM" },
+                { id: 104, tag: "Learn", title: "Beautiful Chemistry Precipitation", desc: "High-definition, scientific macro closeups of chemical molecules crashing together to grow colorful crystals.", videoId: "HSlQGFNstg0" }
+            ],
+            laugh: [
+                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Challenges", desc: "Witty, unstructured British panel comedy. Brilliant creators waste intellectual energy on pointless, hilarious challenges.", videoId: "v4YhsooE5xY" },
+                { id: 202, tag: "Laugh", title: "Baumgartner Restoration Parody", desc: "A lighthearted, playful look at the obsession behind repairing old physical items, bringing a chuckle to high-pressure days.", videoId: "32SBBSNpwSE" }
+            ],
+            listen: [
+                { id: 301, tag: "Listen", title: "Moby - Infinite Ambient Drones", desc: "A textured sonic environment designed with evolving synthesizer currents to gently slow your active heart rate down.", videoId: "YXO6DwiupIc" },
+                { id: 302, tag: "Listen", title: "Mushroom Synthesizers", desc: "Eerie, lush modular synth soundscapes programmed using the active bio-rhythms of real forest fungi.", videoId: "916Iva8llvE" },
+                { id: 303, tag: "Listen", title: "My Self Reliance - Cabin ASMR", desc: "Get away from processed sounds. Sink into the natural rhythm of wind, crackling fire, and timber stacking.", videoId: "sG5fSCelTfQ" }
+            ]
+        };
 
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('youtube-player', {
@@ -394,7 +401,6 @@
             isApiReady = true;
         }
 
-        // Toggle selected preferences on/off
         function toggleSelection(element, value) {
             element.classList.toggle('selected');
             if (selectedPreferences.includes(value)) {
@@ -404,58 +410,56 @@
             }
         }
 
-        // ALGORITHMIC COUNTER-MATCHING ENGINE
+        // GENERATE FLIGHT BASED ON THE THREE DEDICATED COLUMNS
         function generateAntidoteFlight() {
             if (selectedPreferences.length === 0) {
                 alert("Please select at least one bubble preference so we can calculate its opposite!");
                 return;
             }
 
-            // Simple profile checking
-            let isDigitalHigh = selectedPreferences.includes('tutorials') || selectedPreferences.includes('news');
-            let isMusicPredictable = selectedPreferences.includes('mainstream');
-            let isComedyFan = selectedPreferences.includes('uk_comedy');
+            // Create fresh copies of our category pools
+            remainingPool.learn = [...masterDatabase.learn];
+            remainingPool.laugh = [...masterDatabase.laugh];
+            remainingPool.listen = [...masterDatabase.listen];
 
-            let pool = [...masterDatabase];
-
-            // If user likes digital/tech, prioritize highly tactile physical grounding items
-            if (isDigitalHigh) {
-                pool.sort((a, b) => (b.category === 'grounding') - (a.category === 'grounding'));
-            }
-            // If user likes mainstream/predictable, prioritize retro-tech and modular synths
-            if (isMusicPredictable) {
-                pool.sort((a, b) => (b.category === 'retro_tech') - (a.category === 'retro_tech'));
+            // Setup customized curation hooks depending on selection
+            let likesMusicTech = selectedPreferences.includes('electronic') || selectedPreferences.includes('shoegaze');
+            if (likesMusicTech) {
+                // Prioritize mushroom synths & wild acoustics for their "Listen" choice
+                remainingPool.listen.sort((a, b) => b.title.includes("Mushroom") - a.title.includes("Mushroom"));
             }
 
-            // Fill current flight with the top 3 best fits
-            currentFlight = pool.slice(0, 3);
-            // Put the remaining database items in our "bench" to draw from when a swap happens
-            remainingAntidotes = pool.slice(3);
+            // Pull exactly one item for each of the three spaces
+            currentFlight.learn = remainingPool.learn.shift();
+            currentFlight.laugh = remainingPool.laugh.shift();
+            currentFlight.listen = remainingPool.listen.shift();
 
             renderFlightScreen();
         }
 
-        // RENDER THE FLIGHT
+        // DISPLAY THE DEDICATED LEARN, LAUGH, LISTEN CARDS
         function renderFlightScreen() {
             document.getElementById('screen-setup').classList.remove('active');
             document.getElementById('screen-flight').classList.add('active');
             
-            document.getElementById('flight-intro').innerText = `🌿 Based on your digital habits, we've loaded a balanced flight of counter-weight topics. Tap a card to explore in-app, or swap any card out if it's not the right vibe.`;
+            document.getElementById('flight-intro').innerText = `🌿 Here is your counter-algorithm escape route. Explore one way to Learn, one opportunity to Laugh, and one space to Listen.`;
 
             const container = document.getElementById('flight-items');
             container.innerHTML = ''; 
 
-            currentFlight.forEach((item, index) => {
+            const categories = ['learn', 'laugh', 'listen'];
+            categories.forEach((cat) => {
+                const item = currentFlight[cat];
                 const cardHTML = `
                     <div class="card">
-                        <div onclick="openDive(${index})">
+                        <div onclick="openDive('${cat}')">
                             <div class="card-tag">${item.tag}</div>
                             <h3 class="card-title">${item.title}</h3>
                             <p class="card-desc">${item.desc}</p>
                         </div>
                         <div class="btn-action-group">
-                            <button class="btn-launch" onclick="openDive(${index})">Play In-App →</button>
-                            <button class="btn-swap" onclick="swapCard(${index}, event)" title="Not my vibe, swap this video">Swap 🔄</button>
+                            <button class="btn-launch" onclick="openDive('${cat}')">Play In-App →</button>
+                            <button class="btn-swap" onclick="swapCategoryCard('${cat}', event)" title="Swap this video">Swap 🔄</button>
                         </div>
                     </div>
                 `;
@@ -463,26 +467,23 @@
             });
         }
 
-        // THE SWAP ENGINE
-        function swapCard(index, event) {
-            // Stop click propagation so clicking 'Swap' doesn't trigger 'Open Dive' card click
+        // TARGETED SWAP FUNCTION (Maintains structural categories)
+        function swapCategoryCard(category, event) {
             if (event) event.stopPropagation();
 
-            if (remainingAntidotes.length === 0) {
-                // If we ran out of new videos, recycle the swapped ones
-                alert("You've cycled through all available content! Resetting the pool...");
-                remainingAntidotes = [...masterDatabase].filter(item => !currentFlight.includes(item));
+            let pool = remainingPool[category];
+            if (pool.length === 0) {
+                // Recycle the category list if user cycles all options
+                pool = [...masterDatabase[category]].filter(item => item.id !== currentFlight[category].id);
+                remainingPool[category] = pool;
             }
 
-            // Take the first video off our spare "bench"
-            const newVideo = remainingAntidotes.shift();
+            const nextItem = pool.shift();
+            const oldItem = currentFlight[category];
             
-            // Send the swapped-out video back to the end of the bench so it can appear again later
-            const oldVideo = currentFlight[index];
-            remainingAntidotes.push(oldVideo);
-
-            // Update the display
-            currentFlight[index] = newVideo;
+            pool.push(oldItem); // put old one back at end of queue
+            currentFlight[category] = nextItem;
+            
             renderFlightScreen();
         }
 
@@ -491,8 +492,8 @@
             document.getElementById('screen-setup').classList.add('active');
         }
 
-        function openDive(index) {
-            const item = currentFlight[index];
+        function openDive(category) {
+            const item = currentFlight[category];
             document.getElementById('dive-title').innerText = item.title;
             document.getElementById('dive-desc').innerText = item.desc;
             document.getElementById('dive-overlay').classList.add('active');
