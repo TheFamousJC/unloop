@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UnLoop - Learn, Laugh, Listen</title>
+    <title>UnLoop - The Counter-Algorithm Sandbox</title>
     <style>
         :root {
             --bg-color: #121214;
@@ -12,7 +12,6 @@
             --text-muted: #9ca3af;
             --accent-color: #a78bfa;
             --accent-hover: #c084fc;
-            --success-color: #34d399;
         }
 
         body {
@@ -54,7 +53,7 @@
             display: block;
         }
 
-        /* SETUP / QUIZ STYLING */
+        /* ONBOARDING SETUP BOX */
         .setup-box {
             background-color: var(--card-bg);
             border: 1px solid #2e2e33;
@@ -67,7 +66,7 @@
         .setup-title {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border-bottom: 1px solid #2e2e33;
             padding-bottom: 15px;
         }
@@ -76,6 +75,7 @@
             color: var(--text-muted);
             margin-bottom: 2rem;
             line-height: 1.5;
+            font-size: 0.95rem;
         }
 
         .option-group {
@@ -86,9 +86,10 @@
             font-weight: 600;
             display: block;
             margin-bottom: 10px;
+            font-size: 1rem;
         }
 
-        /* Pill Buttons for Selection */
+        /* Pill Selection Grid */
         .pill-grid {
             display: flex;
             flex-wrap: wrap;
@@ -103,7 +104,7 @@
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .pill.selected {
@@ -131,7 +132,7 @@
             background-color: var(--accent-hover);
         }
 
-        /* FLIGHT STYLING */
+        /* FLIGHT MENU STYLING */
         .flight-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -309,34 +310,44 @@
 
     <div class="container">
         <h1>UnLoop</h1>
-        <p class="subtitle">Step out of your algorithmic groove.</p>
+        <p class="subtitle">An active counter-agent to your comfortable routine.</p>
 
-        <!-- SCREEN 1: Setup Phase / Onboarding Quiz -->
+        <!-- SCREEN 1: Deep Setup Phase (Onboarding) -->
         <div id="screen-setup" class="screen active">
             <div class="setup-box">
-                <div class="setup-title">Step 1: Establish Your Bubble</div>
-                <div class="setup-subtitle">Select the topics you normally default to on daily apps. UnLoop will build a tailored antidote menu containing exactly one new thing to Learn, one way to Laugh, and one thing to Listen to.</div>
+                <div class="setup-title">Setup: Map Your Digital Routine</div>
+                <div class="setup-subtitle">The more detailed you are, the more aggressively UnLoop can reverse-engineer your algorithmic profile. Choose everything that applies to you below.</div>
                 
                 <div class="option-group">
-                    <span class="option-label">What is your usual music loop?</span>
-                    <div class="pill-grid" id="music-options">
-                        <button class="pill" onclick="toggleSelection(this, 'prog_rock')">Prog Rock & Genesis</button>
-                        <button class="pill" onclick="toggleSelection(this, 'electronic')">Ambient & Moby</button>
-                        <button class="pill" onclick="toggleSelection(this, 'shoegaze')">Shoegaze & Ride</button>
-                        <button class="pill" onclick="toggleSelection(this, 'mainstream')">Mainstream Pop / Radio Hits</button>
+                    <span class="option-label">1. What music dominates your current apps?</span>
+                    <div class="pill-grid">
+                        <button class="pill" onclick="toggleSelection(this, 'prog_rock')">Genesis / Classic Prog Rock</button>
+                        <button class="pill" onclick="toggleSelection(this, 'electronic')">Moby / Ambient Electronics</button>
+                        <button class="pill" onclick="toggleSelection(this, 'shoegaze')">Ride / Dreamy Shoegaze</button>
+                        <button class="pill" onclick="toggleSelection(this, 'mainstream')">Chart Pop & Mainstream Hits</button>
                     </div>
                 </div>
 
                 <div class="option-group">
-                    <span class="option-label">What is your typical entertainment loop?</span>
-                    <div class="pill-grid" id="comedy-options">
+                    <span class="option-label">2. What type of video/text content do you scroll most?</span>
+                    <div class="pill-grid">
+                        <button class="pill" onclick="toggleSelection(this, 'tutorials')">Software Engineering & Tech Tutorials</button>
+                        <button class="pill" onclick="toggleSelection(this, 'social_gossip')">Rapid short form videos & social commentary</button>
                         <button class="pill" onclick="toggleSelection(this, 'uk_comedy')">UK Comedy Panel Shows</button>
-                        <button class="pill" onclick="toggleSelection(this, 'tutorials')">Coding & Tech Tutorials</button>
-                        <button class="pill" onclick="toggleSelection(this, 'news')">Daily News & Social Feeds</button>
+                        <button class="pill" onclick="toggleSelection(this, 'news_docs')">Serious Daily News & Political Documentaries</button>
                     </div>
                 </div>
 
-                <button class="btn-submit" onclick="generateAntidoteFlight()">Build My Antidote Flight →</button>
+                <div class="option-group">
+                    <span class="option-label">3. What best describes your active state of mind right now?</span>
+                    <div class="pill-grid">
+                        <button class="pill" onclick="toggleSelection(this, 'overstimulated')">Overstimulated & Brain-tired</button>
+                        <button class="pill" onclick="toggleSelection(this, 'bored_passive')">Bored, stuck in a predictable comfort loop</button>
+                        <button class="pill" onclick="toggleSelection(this, 'task_focused')">Overly logical & hyper-focused on productivity</button>
+                    </div>
+                </div>
+
+                <button class="btn-submit" onclick="generateAntiAlgorithmFlight()">Generate Counter-Intuitive Flight →</button>
             </div>
         </div>
 
@@ -347,7 +358,7 @@
                 <!-- Flight Cards render dynamically here -->
             </div>
             <div>
-                <button class="back-button" onclick="goBackToSetup()">← Edit My Preferences</button>
+                <button class="back-button" onclick="goBackToSetup()">← Reset My Bubble</button>
             </div>
         </div>
     </div>
@@ -372,22 +383,22 @@
         let currentFlight = { learn: null, laugh: null, listen: null };
         let remainingPool = { learn: [], laugh: [], listen: [] };
 
-        // CURATED DATABASE STRUCTERED DIRECTLY BY LEARN, LAUGH, LISTEN
+        // DENSE HIGH-PASSION MEDIA POOL
         const masterDatabase = {
             learn: [
-                { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Explore physical engineering of the late 19th-century. Watch a massive mechanical music box play 20 acoustic instruments at once.", videoId: "L1eM9pYqS-Q" },
-                { id: 102, tag: "Learn", title: "Alleyway Foraging in London", desc: "Change how you walk through cities. Discover active medicinal and edible wild plants growing straight out of sidewalk cracks.", videoId: "48B1_kY2sfI" },
-                { id: 103, tag: "Learn", title: "Artisanal PSone Restoration", desc: "Relax as a vintage, broken plastic console is carefully taken apart, retro-brightened, and fully restored with classic tools.", videoId: "7t4KIYOipQM" },
-                { id: 104, tag: "Learn", title: "Beautiful Chemistry Precipitation", desc: "High-definition, scientific macro closeups of chemical molecules crashing together to grow colorful crystals.", videoId: "HSlQGFNstg0" }
+                { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Retro physical engineering. A self-playing musical room with physical pipes, drums, and organs executing mechanical code.", videoId: "L1eM9pYqS-Q" },
+                { id: 102, tag: "Learn", title: "Urban Sidewalk Foraging", desc: "Discover how to spot, identify, and harvest edible and medicinal wild weeds growing directly from concrete cracks in central London.", videoId: "48B1_kY2sfI" },
+                { id: 103, tag: "Learn", title: "Clockwork Toy Restoration", desc: "A mesmerizingly slow, high-focus repair process where a rusted 1920s metal toy train is perfectly cleaned, oiled, and rebuilt.", videoId: "7t4KIYOipQM" },
+                { id: 104, tag: "Learn", title: "Beautiful Chemistry Growth", desc: "Close-up macro lens time-lapses of chemical precipitation reactions forming geometric, brilliant crystal trees.", videoId: "HSlQGFNstg0" }
             ],
             laugh: [
-                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Challenges", desc: "Witty, unstructured British panel comedy. Brilliant creators waste intellectual energy on pointless, hilarious challenges.", videoId: "v4YhsooE5xY" },
-                { id: 202, tag: "Laugh", title: "Baumgartner Restoration Parody", desc: "A lighthearted, playful look at the obsession behind repairing old physical items, bringing a chuckle to high-pressure days.", videoId: "32SBBSNpwSE" }
+                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Play", desc: "Witty British panel comedy. Sharp minds are forced to complete entirely irrational, creative, and chaotic trials for zero practical gain.", videoId: "v4YhsooE5xY" },
+                { id: 202, tag: "Laugh", title: "The Art of Doing Nothing", desc: "A delightful, satiric exploration challenging our relentless productivity culture and celebration of daily stress.", videoId: "32SBBSNpwSE" }
             ],
             listen: [
-                { id: 301, tag: "Listen", title: "Moby - Infinite Ambient Drones", desc: "A textured sonic environment designed with evolving synthesizer currents to gently slow your active heart rate down.", videoId: "YXO6DwiupIc" },
-                { id: 302, tag: "Listen", title: "Mushroom Synthesizers", desc: "Eerie, lush modular synth soundscapes programmed using the active bio-rhythms of real forest fungi.", videoId: "916Iva8llvE" },
-                { id: 303, tag: "Listen", title: "My Self Reliance - Cabin ASMR", desc: "Get away from processed sounds. Sink into the natural rhythm of wind, crackling fire, and timber stacking.", videoId: "sG5fSCelTfQ" }
+                { id: 301, tag: "Listen", title: "Moby - Long Ambient Sounds", desc: "An evolving synthesizer architecture with incredibly slow build-ups, designed to create a cozy cocoon for a racing brain.", videoId: "YXO6DwiupIc" },
+                { id: 302, tag: "Listen", title: "Mushroom Modular Synth", desc: "An atmospheric ambient stream modulated in real-time by running electrical micro-voltages through a forest oyster mushroom.", videoId: "916Iva8llvE" },
+                { id: 303, tag: "Listen", title: "Wilderness Cabin ASMR", desc: "Submerge yourself in deep, comforting environmental sounds: howling wind, heavy timber shifting, and crackling log fires.", videoId: "sG5fSCelTfQ" }
             ]
         };
 
@@ -410,26 +421,49 @@
             }
         }
 
-        // GENERATE FLIGHT BASED ON THE THREE DEDICATED COLUMNS
-        function generateAntidoteFlight() {
+        // THE CLEVER MIRROR-MATRIX ENGINE
+        function generateAntiAlgorithmFlight() {
             if (selectedPreferences.length === 0) {
-                alert("Please select at least one bubble preference so we can calculate its opposite!");
+                alert("Select some boxes so we can reverse-engineer your algorithmic profile!");
                 return;
             }
 
-            // Create fresh copies of our category pools
+            // Create fresh category pools
             remainingPool.learn = [...masterDatabase.learn];
             remainingPool.laugh = [...masterDatabase.laugh];
             remainingPool.listen = [...masterDatabase.listen];
 
-            // Setup customized curation hooks depending on selection
-            let likesMusicTech = selectedPreferences.includes('electronic') || selectedPreferences.includes('shoegaze');
-            if (likesMusicTech) {
-                // Prioritize mushroom synths & wild acoustics for their "Listen" choice
+            // 1. CALCULATE PROFILE METRICS
+            let stimulusLevel = 0;   // High stimulation (social scrolling, overstimulated)
+            let analyticalLevel = 0; // High logic (tutorials, task-focused)
+            let passiveLevel = 0;    // Low effort comfort (mainstream hits, bored)
+
+            if (selectedPreferences.includes('social_gossip')) stimulusLevel += 5;
+            if (selectedPreferences.includes('overstimulated')) stimulusLevel += 5;
+            if (selectedPreferences.includes('tutorials')) analyticalLevel += 5;
+            if (selectedPreferences.includes('task_focused')) analyticalLevel += 5;
+            if (selectedPreferences.includes('mainstream')) passiveLevel += 5;
+            if (selectedPreferences.includes('bored_passive')) passiveLevel += 5;
+
+            // 2. APPLY THE COUNTER-INTUITIVE RULES
+            // If user is overstimulated (Stimulus is high), we push slow, ultra-quiet, offline grounding content to the top.
+            if (stimulusLevel >= 5) {
+                remainingPool.learn.sort((a, b) => b.title.includes("Restoration") - a.title.includes("Restoration"));
+                remainingPool.listen.sort((a, b) => b.title.includes("Cabin") - a.title.includes("Cabin"));
+            }
+
+            // If user is trapped in logical productivity mode (Analytical is high), we feed them absurdist humor and organic synths.
+            if (analyticalLevel >= 5) {
+                remainingPool.laugh.sort((a, b) => b.title.includes("Taskmaster") - a.title.includes("Taskmaster"));
                 remainingPool.listen.sort((a, b) => b.title.includes("Mushroom") - a.title.includes("Mushroom"));
             }
 
-            // Pull exactly one item for each of the three spaces
+            // If they are bored/passive, we slam them with high-complexity macro physics/chemistry or odd mechanical automation.
+            if (passiveLevel >= 5) {
+                remainingPool.learn.sort((a, b) => b.title.includes("Chemistry") - a.title.includes("Chemistry"));
+            }
+
+            // Pull exactly one item for each space
             currentFlight.learn = remainingPool.learn.shift();
             currentFlight.laugh = remainingPool.laugh.shift();
             currentFlight.listen = remainingPool.listen.shift();
@@ -437,12 +471,11 @@
             renderFlightScreen();
         }
 
-        // DISPLAY THE DEDICATED LEARN, LAUGH, LISTEN CARDS
         function renderFlightScreen() {
             document.getElementById('screen-setup').classList.remove('active');
             document.getElementById('screen-flight').classList.add('active');
             
-            document.getElementById('flight-intro').innerText = `🌿 Here is your counter-algorithm escape route. Explore one way to Learn, one opportunity to Laugh, and one space to Listen.`;
+            document.getElementById('flight-intro').innerText = `🧩 Mirror-Matrix active. Based on your current routine, we have loaded a balanced counter-algorithm menu containing exactly one new way to Learn, one way to Laugh, and one space to Listen.`;
 
             const container = document.getElementById('flight-items');
             container.innerHTML = ''; 
@@ -459,7 +492,7 @@
                         </div>
                         <div class="btn-action-group">
                             <button class="btn-launch" onclick="openDive('${cat}')">Play In-App →</button>
-                            <button class="btn-swap" onclick="swapCategoryCard('${cat}', event)" title="Swap this video">Swap 🔄</button>
+                            <button class="btn-swap" onclick="swapCategoryCard('${cat}', event)" title="Not my vibe, swap this video">Swap 🔄</button>
                         </div>
                     </div>
                 `;
@@ -467,13 +500,11 @@
             });
         }
 
-        // TARGETED SWAP FUNCTION (Maintains structural categories)
         function swapCategoryCard(category, event) {
             if (event) event.stopPropagation();
 
             let pool = remainingPool[category];
             if (pool.length === 0) {
-                // Recycle the category list if user cycles all options
                 pool = [...masterDatabase[category]].filter(item => item.id !== currentFlight[category].id);
                 remainingPool[category] = pool;
             }
@@ -481,7 +512,7 @@
             const nextItem = pool.shift();
             const oldItem = currentFlight[category];
             
-            pool.push(oldItem); // put old one back at end of queue
+            pool.push(oldItem);
             currentFlight[category] = nextItem;
             
             renderFlightScreen();
