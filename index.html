@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UnLoop - The Counter-Algorithm Sandbox</title>
+    <title>UnLoop - The Discovery Engine</title>
     <style>
         :root {
-            --bg-color: #121214;
-            --card-bg: #1a1a1e;
+            --bg-color: #0c0c0e;
+            --card-bg: #141418;
             --text-color: #f3f4f6;
             --text-muted: #9ca3af;
-            --accent-color: #a78bfa;
-            --accent-hover: #c084fc;
+            --accent-color: #c084fc;
+            --accent-hover: #d8b4fe;
+            --danger-color: #f87171;
         }
 
         body {
@@ -28,21 +29,24 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
-            padding: 20px;
+            max-width: 850px;
+            padding: 30px 20px;
             text-align: center;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 0.5rem;
             letter-spacing: -0.05em;
+            background: linear-gradient(to right, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
             color: var(--text-muted);
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            font-size: 1.15rem;
         }
 
         .screen {
@@ -53,86 +57,101 @@
             display: block;
         }
 
-        /* ONBOARDING SETUP BOX */
+        /* MATRIX SETUP BOX */
         .setup-box {
             background-color: var(--card-bg);
-            border: 1px solid #2e2e33;
-            border-radius: 20px;
+            border: 1px solid #222227;
+            border-radius: 24px;
             padding: 40px;
             text-align: left;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
 
         .setup-title {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            border-bottom: 1px solid #2e2e33;
+            border-bottom: 1px solid #222227;
             padding-bottom: 15px;
         }
 
         .setup-subtitle {
             color: var(--text-muted);
-            margin-bottom: 2rem;
-            line-height: 1.5;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
             font-size: 0.95rem;
         }
 
         .option-group {
-            margin-bottom: 25px;
+            margin-bottom: 35px;
         }
 
         .option-label {
             font-weight: 600;
             display: block;
-            margin-bottom: 10px;
-            font-size: 1rem;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            color: #e5e7eb;
         }
 
-        /* Pill Selection Grid */
+        /* 10-Option Pill Grid */
         .pill-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
 
+        @media (min-width: 600px) {
+            .pill-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         .pill {
-            background-color: #222226;
-            border: 1px solid #3f3f46;
-            color: var(--text-color);
-            padding: 10px 18px;
-            border-radius: 20px;
+            background-color: #1a1a22;
+            border: 1px solid #2d2d39;
+            color: var(--text-muted);
+            padding: 12px 14px;
+            border-radius: 16px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .pill:hover {
+            border-color: var(--accent-color);
+            color: var(--text-color);
         }
 
         .pill.selected {
             background-color: var(--accent-color);
-            color: #121214;
+            color: #0c0c0e;
             border-color: var(--accent-color);
             font-weight: 600;
         }
 
         .btn-submit {
-            background-color: var(--accent-color);
-            color: #121214;
+            background: linear-gradient(135deg, #a78bfa, #c084fc);
+            color: #0c0c0e;
             font-weight: 700;
             border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
+            padding: 18px 30px;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
-            font-size: 1.1rem;
-            transition: background 0.2s;
+            font-size: 1.15rem;
+            transition: all 0.2s;
             margin-top: 15px;
+            letter-spacing: -0.01em;
         }
 
         .btn-submit:hover {
-            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(192, 132, 252, 0.3);
         }
 
-        /* FLIGHT MENU STYLING */
+        /* FLIGHT DISPLAY STYLING */
         .flight-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -148,16 +167,16 @@
 
         .card {
             background-color: var(--card-bg);
-            border: 1px solid #2e2e33;
-            border-radius: 16px;
+            border: 1px solid #222227;
+            border-radius: 20px;
             padding: 24px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 250px;
+            min-height: 270px;
         }
 
         .card:hover {
@@ -168,15 +187,15 @@
         .card-tag {
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--accent-color);
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 8px;
         }
 
         .card-title {
-            font-size: 1.15rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: 700;
             margin: 0 0 10px 0;
             line-height: 1.3;
         }
@@ -185,7 +204,7 @@
             font-size: 0.9rem;
             color: var(--text-muted);
             margin: 0 0 20px 0;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         .btn-action-group {
@@ -195,11 +214,11 @@
 
         .btn-launch {
             flex-grow: 2;
-            background-color: #2e2e33;
+            background-color: #1a1a22;
             color: var(--text-color);
-            border: 1px solid #3f3f46;
-            padding: 10px;
-            border-radius: 8px;
+            border: 1px solid #2d2d39;
+            padding: 12px;
+            border-radius: 10px;
             text-align: center;
             font-size: 0.85rem;
             font-weight: 600;
@@ -208,35 +227,35 @@
 
         .btn-swap {
             flex-grow: 1;
-            background-color: #222226;
+            background-color: #141418;
             color: var(--text-muted);
-            border: 1px solid #3f3f46;
-            padding: 10px;
-            border-radius: 8px;
+            border: 1px solid #2d2d39;
+            padding: 12px;
+            border-radius: 10px;
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .btn-swap:hover {
-            background-color: #ef4444;
+            background-color: var(--danger-color);
             color: white;
-            border-color: #ef4444;
+            border-color: var(--danger-color);
         }
 
         .back-button {
             background: none;
-            border: 1px solid #2e2e33;
+            border: 1px solid #222227;
             color: var(--text-color);
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 30px;
+            margin-top: 40px;
             transition: background 0.2s;
         }
 
         .back-button:hover {
-            background-color: #2e2e33;
+            background-color: #1a1a22;
         }
 
         /* OVERLAY PLAYER */
@@ -247,8 +266,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(18, 18, 20, 0.95);
-            z-index: 100;
+            background-color: rgba(6, 6, 8, 0.97);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -262,10 +281,10 @@
         .overlay-content {
             background-color: var(--card-bg);
             width: 100%;
-            max-width: 650px;
-            border-radius: 20px;
-            border: 1px solid #2e2e33;
-            padding: 24px;
+            max-width: 700px;
+            border-radius: 24px;
+            border: 1px solid #222227;
+            padding: 28px;
             position: relative;
             box-sizing: border-box;
         }
@@ -277,7 +296,7 @@
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 2rem;
+            font-size: 2.2rem;
             cursor: pointer;
         }
 
@@ -290,12 +309,12 @@
             padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
-            border-radius: 12px;
+            border-radius: 14px;
             background: #000;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
-        .embed-container #youtube-player {
+        .embed-container iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -310,60 +329,82 @@
 
     <div class="container">
         <h1>UnLoop</h1>
-        <p class="subtitle">An active counter-agent to your comfortable routine.</p>
+        <p class="subtitle">An antidote to predictable digital loops.</p>
 
-        <!-- SCREEN 1: Deep Setup Phase (Onboarding) -->
+        <!-- SCREEN 1: Deep 30-Pill Onboarding Matrix -->
         <div id="screen-setup" class="screen active">
             <div class="setup-box">
-                <div class="setup-title">Setup: Map Your Digital Routine</div>
-                <div class="setup-subtitle">The more detailed you are, the more aggressively UnLoop can reverse-engineer your algorithmic profile. Choose everything that applies to you below.</div>
+                <div class="setup-title">Step 1: Define Your Algorithms</div>
+                <div class="setup-subtitle">Select the elements that dominate your daily digital diet. Our inversion engine will analyze your choices and compile a counter-intuitive menu to broaden your perspective.</div>
                 
+                <!-- 10 MUSIC GENRES -->
                 <div class="option-group">
-                    <span class="option-label">1. What music dominates your current apps?</span>
-                    <div class="pill-grid">
-                        <button class="pill" onclick="toggleSelection(this, 'prog_rock')">Genesis / Classic Prog Rock</button>
-                        <button class="pill" onclick="toggleSelection(this, 'electronic')">Moby / Ambient Electronics</button>
-                        <button class="pill" onclick="toggleSelection(this, 'shoegaze')">Ride / Dreamy Shoegaze</button>
-                        <button class="pill" onclick="toggleSelection(this, 'mainstream')">Chart Pop & Mainstream Hits</button>
+                    <span class="option-label">Which music genres dominate your streaming feeds?</span>
+                    <div class="pill-grid" id="music-group">
+                        <button class="pill" onclick="selectItem(this, 'music', 'shoegaze')">Shoegaze & Dream-Pop</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'ambient')">Ambient Electronics</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'prog')">Progressive Rock</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'math')">Math Rock</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'synthwave')">Retro Synthwave</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'postrock')">Post-Rock</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'kraut')">Krautrock</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'lofi')">Lo-Fi Chill</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'folk')">Independent Folk</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'pop')">Mainstream Hits & Pop</button>
                     </div>
                 </div>
 
+                <!-- 10 VIDEO CATEGORIES -->
                 <div class="option-group">
-                    <span class="option-label">2. What type of video/text content do you scroll most?</span>
-                    <div class="pill-grid">
-                        <button class="pill" onclick="toggleSelection(this, 'tutorials')">Software Engineering & Tech Tutorials</button>
-                        <button class="pill" onclick="toggleSelection(this, 'social_gossip')">Rapid short form videos & social commentary</button>
-                        <button class="pill" onclick="toggleSelection(this, 'uk_comedy')">UK Comedy Panel Shows</button>
-                        <button class="pill" onclick="toggleSelection(this, 'news_docs')">Serious Daily News & Political Documentaries</button>
+                    <span class="option-label">What video styles do you find yourself scrolling most?</span>
+                    <div class="pill-grid" id="video-group">
+                        <button class="pill" onclick="selectItem(this, 'video', 'tutorials')">Tech & Code Tutorials</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'memes')">Short Memes & Social Clips</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'docs')">Serious Political Docs</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'business')">Finance & Productivity Hacks</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'gossip')">Reality TV & Gossip</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'sports')">Sports Highlights</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'asmr')">Quiet ASMR & Restful Vlogs</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'crime')">True Crime & Mystery</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'games')">Video Game Playthroughs</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'trailers')">Movie Trailers & Promos</button>
                     </div>
                 </div>
 
+                <!-- 10 REAL-WORLD MOODS -->
                 <div class="option-group">
-                    <span class="option-label">3. What best describes your active state of mind right now?</span>
-                    <div class="pill-grid">
-                        <button class="pill" onclick="toggleSelection(this, 'overstimulated')">Overstimulated & Brain-tired</button>
-                        <button class="pill" onclick="toggleSelection(this, 'bored_passive')">Bored, stuck in a predictable comfort loop</button>
-                        <button class="pill" onclick="toggleSelection(this, 'task_focused')">Overly logical & hyper-focused on productivity</button>
+                    <span class="option-label">What represents your mental state when on your phone?</span>
+                    <div class="pill-grid" id="mood-group">
+                        <button class="pill" onclick="selectItem(this, 'mood', 'wired')">Overstimulated & Wired</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'autopilot')">Bored & on Autopilot</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'analytical')">Overly Logical & Analytical</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'cozy')">Cozy & Reflective</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'hype')">Seeking High Energy</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'nostalgic')">Nostalgic & Reminiscing</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'fragmented')">Distracted & Fragmented</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'melancholic')">Melancholic & Quiet</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'restless')">Restless & Seeking Focus</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'indifferent')">Indifferent & Numb</button>
                     </div>
                 </div>
 
-                <button class="btn-submit" onclick="generateAntiAlgorithmFlight()">Generate Counter-Intuitive Flight →</button>
+                <button class="btn-submit" onclick="buildInvertedFlight()">Build Antidote Flight →</button>
             </div>
         </div>
 
-        <!-- SCREEN 2: The Custom Flight Screen -->
+        <!-- SCREEN 2: Learn, Laugh, Listen Flight Menu -->
         <div id="screen-flight" class="screen">
             <p id="flight-intro" style="color: var(--text-muted); font-size: 1.1rem; text-align: left; font-style: italic;"></p>
             <div class="flight-grid" id="flight-items">
-                <!-- Flight Cards render dynamically here -->
+                <!-- Calculated Cards Load Here -->
             </div>
             <div>
-                <button class="back-button" onclick="goBackToSetup()">← Reset My Bubble</button>
+                <button class="back-button" onclick="goBackToSetup()">← Reset Onboarding Profile</button>
             </div>
         </div>
     </div>
 
-    <!-- SCREEN 3: Deep Dive Player Box -->
+    <!-- SCREEN 3: Lightbox Player -->
     <div id="dive-overlay" class="overlay">
         <div class="overlay-content">
             <button class="btn-close" onclick="closeDive()">×</button>
@@ -378,27 +419,27 @@
     <script>
         let ytPlayer;
         let isApiReady = false;
-        
-        let selectedPreferences = [];
+
+        let userSelections = { music: [], video: [], mood: [] };
         let currentFlight = { learn: null, laugh: null, listen: null };
         let remainingPool = { learn: [], laugh: [], listen: [] };
 
-        // DENSE HIGH-PASSION MEDIA POOL
+        // DEEPLY CURATED HIGH-PASSION MEDIA REPOSITORY
         const masterDatabase = {
             learn: [
-                { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Retro physical engineering. A self-playing musical room with physical pipes, drums, and organs executing mechanical code.", videoId: "L1eM9pYqS-Q" },
-                { id: 102, tag: "Learn", title: "Urban Sidewalk Foraging", desc: "Discover how to spot, identify, and harvest edible and medicinal wild weeds growing directly from concrete cracks in central London.", videoId: "48B1_kY2sfI" },
-                { id: 103, tag: "Learn", title: "Clockwork Toy Restoration", desc: "A mesmerizingly slow, high-focus repair process where a rusted 1920s metal toy train is perfectly cleaned, oiled, and rebuilt.", videoId: "7t4KIYOipQM" },
-                { id: 104, tag: "Learn", title: "Beautiful Chemistry Growth", desc: "Close-up macro lens time-lapses of chemical precipitation reactions forming geometric, brilliant crystal trees.", videoId: "HSlQGFNstg0" }
+                { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Witness the complex physical machinery of massive self-playing mechanical orchestras built at the close of the 19th-century.", videoId: "L1eM9pYqS-Q", tags: ["mechanical", "tactile", "complex"] },
+                { id: 102, tag: "Learn", title: "Urban Concrete Foraging", desc: "Discover active medicinal plants and edible foliage thriving in the brickwork of historic London alleys.", videoId: "48B1_kY2sfI", tags: ["nature", "grounding", "outdoors"] },
+                { id: 103, tag: "Learn", title: "PSone Hardware Restoration", desc: "A quiet, highly detailed mechanical repair where a yellowed console is taken apart and renewed with manual instruments.", videoId: "7t4KIYOipQM", tags: ["tactile", "retro", "quiet"] },
+                { id: 104, tag: "Learn", title: "Beautiful Chemistry Crystal Growth", desc: "High-definition scientific macro photography showcasing chemical crystallization spreading over geometric bounds.", videoId: "HSlQGFNstg0", tags: ["science", "visuals", "complex"] }
             ],
             laugh: [
-                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Play", desc: "Witty British panel comedy. Sharp minds are forced to complete entirely irrational, creative, and chaotic trials for zero practical gain.", videoId: "v4YhsooE5xY" },
-                { id: 202, tag: "Laugh", title: "The Art of Doing Nothing", desc: "A delightful, satiric exploration challenging our relentless productivity culture and celebration of daily stress.", videoId: "32SBBSNpwSE" }
+                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Creative Logic", desc: "A masterful dose of British panel comedy where brilliant writers apply intense logical focus to entirely pointless, playful tasks.", videoId: "v4YhsooE5xY", tags: ["absurdist", "wit", "creative"] },
+                { id: 202, tag: "Laugh", title: "The Art of Constructive Boredom", desc: "A humorous, deeply counter-cultural film exploring why slowing down and doing absolutely nothing is essential to intellectual health.", videoId: "32SBBSNpwSE", tags: ["parody", "mindfulness", "quirky"] }
             ],
             listen: [
-                { id: 301, tag: "Listen", title: "Moby - Long Ambient Sounds", desc: "An evolving synthesizer architecture with incredibly slow build-ups, designed to create a cozy cocoon for a racing brain.", videoId: "YXO6DwiupIc" },
-                { id: 302, tag: "Listen", title: "Mushroom Modular Synth", desc: "An atmospheric ambient stream modulated in real-time by running electrical micro-voltages through a forest oyster mushroom.", videoId: "916Iva8llvE" },
-                { id: 303, tag: "Listen", title: "Wilderness Cabin ASMR", desc: "Submerge yourself in deep, comforting environmental sounds: howling wind, heavy timber shifting, and crackling log fires.", videoId: "sG5fSCelTfQ" }
+                { id: 301, tag: "Listen", title: "Moby - Long Ambient Synths", desc: "A quiet, structural soundscape designed with slowly developing synthetic waves to lower cognitive stress.", videoId: "YXO6DwiupIc", tags: ["synth", "ambient", "calming"] },
+                { id: 302, tag: "Listen", title: "Modular Synthesizer Botany", desc: "Lush ambient waveforms modulated in real-time by feeding electric micro-currents through living oyster mushrooms.", videoId: "916Iva8llvE", tags: ["organic", "synth", "unusual"] },
+                { id: 303, tag: "Listen", title: "Wilderness Log Cabin ASMR", desc: "Escape synthesized environments completely. Enjoy the acoustic details of snow falling, wood carving, and natural crackling fires.", videoId: "sG5fSCelTfQ", tags: ["nature", "quiet", "acoustic"] }
             ]
         };
 
@@ -412,58 +453,56 @@
             isApiReady = true;
         }
 
-        function toggleSelection(element, value) {
-            element.classList.toggle('selected');
-            if (selectedPreferences.includes(value)) {
-                selectedPreferences = selectedPreferences.filter(item => item !== value);
+        // Handle onboarding selections across our groups
+        function selectItem(button, category, value) {
+            button.classList.toggle('selected');
+            if (userSelections[category].includes(value)) {
+                userSelections[category] = userSelections[category].filter(item => item !== value);
             } else {
-                selectedPreferences.push(value);
+                userSelections[category].push(value);
             }
         }
 
-        // THE CLEVER MIRROR-MATRIX ENGINE
-        function generateAntiAlgorithmFlight() {
-            if (selectedPreferences.length === 0) {
-                alert("Select some boxes so we can reverse-engineer your algorithmic profile!");
+        // TRUE COUNTER-ALGORITHM ENGINE (INVERSION METHOD)
+        function buildInvertedFlight() {
+            const hasMusic = userSelections.music.length > 0;
+            const hasVideo = userSelections.video.length > 0;
+            const hasMood = userSelections.mood.length > 0;
+
+            if (!hasMusic || !hasVideo || !hasMood) {
+                alert("Please select at least one item in each of the three sections so we can correctly compute your bubble.");
                 return;
             }
 
-            // Create fresh category pools
+            // Fresh database allocations
             remainingPool.learn = [...masterDatabase.learn];
             remainingPool.laugh = [...masterDatabase.laugh];
             remainingPool.listen = [...masterDatabase.listen];
 
-            // 1. CALCULATE PROFILE METRICS
-            let stimulusLevel = 0;   // High stimulation (social scrolling, overstimulated)
-            let analyticalLevel = 0; // High logic (tutorials, task-focused)
-            let passiveLevel = 0;    // Low effort comfort (mainstream hits, bored)
+            // Setup profile flags
+            const isHighlyAnalytical = userSelections.video.includes('tutorials') || userSelections.mood.includes('analytical');
+            const isHighlyOverstimulated = userSelections.video.includes('memes') || userSelections.mood.includes('wired') || userSelections.mood.includes('fragmented');
+            const isPassiveBored = userSelections.music.includes('pop') || userSelections.mood.includes('autopilot') || userSelections.mood.includes('indifferent');
 
-            if (selectedPreferences.includes('social_gossip')) stimulusLevel += 5;
-            if (selectedPreferences.includes('overstimulated')) stimulusLevel += 5;
-            if (selectedPreferences.includes('tutorials')) analyticalLevel += 5;
-            if (selectedPreferences.includes('task_focused')) analyticalLevel += 5;
-            if (selectedPreferences.includes('mainstream')) passiveLevel += 5;
-            if (selectedPreferences.includes('bored_passive')) passiveLevel += 5;
-
-            // 2. APPLY THE COUNTER-INTUITIVE RULES
-            // If user is overstimulated (Stimulus is high), we push slow, ultra-quiet, offline grounding content to the top.
-            if (stimulusLevel >= 5) {
-                remainingPool.learn.sort((a, b) => b.title.includes("Restoration") - a.title.includes("Restoration"));
-                remainingPool.listen.sort((a, b) => b.title.includes("Cabin") - a.title.includes("Cabin"));
+            // Apply opposite-vector sort operations
+            if (isHighlyOverstimulated) {
+                // Oppose high-stimulus with low-speed, natural, non-digital, grounding tasks
+                remainingPool.learn.sort((a, b) => b.tags.includes("quiet") - a.tags.includes("quiet"));
+                remainingPool.listen.sort((a, b) => b.tags.includes("nature") - a.tags.includes("nature"));
             }
 
-            // If user is trapped in logical productivity mode (Analytical is high), we feed them absurdist humor and organic synths.
-            if (analyticalLevel >= 5) {
-                remainingPool.laugh.sort((a, b) => b.title.includes("Taskmaster") - a.title.includes("Taskmaster"));
-                remainingPool.listen.sort((a, b) => b.title.includes("Mushroom") - a.title.includes("Mushroom"));
+            if (isHighlyAnalytical) {
+                // Oppose logic/work fatigue with creative, absurdist humor and organic synthesis
+                remainingPool.laugh.sort((a, b) => b.tags.includes("absurdist") - a.tags.includes("absurdist"));
+                remainingPool.listen.sort((a, b) => b.tags.includes("organic") - a.tags.includes("organic"));
             }
 
-            // If they are bored/passive, we slam them with high-complexity macro physics/chemistry or odd mechanical automation.
-            if (passiveLevel >= 5) {
-                remainingPool.learn.sort((a, b) => b.title.includes("Chemistry") - a.title.includes("Chemistry"));
+            if (isPassiveBored) {
+                // Oppose comfort/boredom loops with complex science or intense mechanical marvels
+                remainingPool.learn.sort((a, b) => b.tags.includes("complex") - a.tags.includes("complex"));
             }
 
-            // Pull exactly one item for each space
+            // Assign top recommendations
             currentFlight.learn = remainingPool.learn.shift();
             currentFlight.laugh = remainingPool.laugh.shift();
             currentFlight.listen = remainingPool.listen.shift();
@@ -475,7 +514,7 @@
             document.getElementById('screen-setup').classList.remove('active');
             document.getElementById('screen-flight').classList.add('active');
             
-            document.getElementById('flight-intro').innerText = `🧩 Mirror-Matrix active. Based on your current routine, we have loaded a balanced counter-algorithm menu containing exactly one new way to Learn, one way to Laugh, and one space to Listen.`;
+            document.getElementById('flight-intro').innerText = `🧩 Counter-Algorithm Compiled. We analyzed your daily routine and generated a counter-weight flight of discovery: one window to Learn, one venue to Laugh, and one path to Listen.`;
 
             const container = document.getElementById('flight-items');
             container.innerHTML = ''; 
@@ -492,7 +531,7 @@
                         </div>
                         <div class="btn-action-group">
                             <button class="btn-launch" onclick="openDive('${cat}')">Play In-App →</button>
-                            <button class="btn-swap" onclick="swapCategoryCard('${cat}', event)" title="Not my vibe, swap this video">Swap 🔄</button>
+                            <button class="btn-swap" onclick="swapCategoryCard('${cat}', event)" title="Not my vibe, swap this card">Swap 🔄</button>
                         </div>
                     </div>
                 `;
