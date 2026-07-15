@@ -513,7 +513,6 @@
         let currentFlight = { learn: null, laugh: null, listen: null };
         let remainingPool = { learn: [], laugh: [], listen: [] };
 
-        // MIXED HIGH-QUALITY PLATFORM DATABASE (YouTube + ad-free Vimeo)
         const masterDatabase = {
             learn: [
                 { id: 101, platform: "vimeo", tag: "Learn", title: "Cymatics - Visualizing Sound", desc: "Watch how physical sound frequencies shape and crystallize physical matters like water, sand, and liquid. Beautifully recorded on high-speed Vimeo.", videoId: "111593581", tags: ["science", "visuals", "complex"] },
@@ -526,7 +525,7 @@
                 { id: 202, platform: "vimeo", tag: "Laugh", title: "The Absurd Box-Man Trick", desc: "A creative, wordless, short artistic physical performance about a man and his cardboard box stack.", videoId: "24673901", tags: ["absurdist", "wit", "quirky", "comedy"] }
             ],
             listen: [
-                { id: 301, platform: "vimeo", tag: "Listen", title: "Infinite Forest Canopy", desc: "Deep cinematic aerial visuals over mist-covered pine forests layered with high-quality binaural mountain winds.", videoId: "22340590", tags: ["nature", "quiet", "ambient"] },
+                { id: 301, platform: "vimeo", tag: "Listen", title: "Silent Iceland Flight", desc: "Drift slowly over dramatic, misty volcanic canyons and rushing rivers in absolute peace.", videoId: "172458428", tags: ["nature", "quiet", "ambient"] },
                 { id: 302, platform: "youtube", tag: "Listen", title: "Moby - Long Ambient Synths", desc: "A quiet, structural soundscape designed with slowly developing synthetic waves to lower cognitive stress.", videoId: "YXO6DwiupIc", tags: ["synth", "ambient", "calming"] },
                 { id: 303, platform: "youtube", tag: "Listen", title: "Modular Synthesizer Botany", desc: "Lush ambient waveforms modulated in real-time by feeding electric micro-currents through living oyster mushrooms.", videoId: "916Iva8llvE", tags: ["organic", "synth", "unusual"] }
             ]
@@ -574,11 +573,9 @@
         }
 
         function modifyPreferences() {
-            // Un-hide setup, load selections
             document.getElementById('screen-flight').classList.remove('active');
             document.getElementById('screen-setup').classList.add('active');
 
-            // Set visual pill selections
             const categories = ['music', 'video', 'mood'];
             categories.forEach(cat => {
                 const group = document.getElementById(`${cat}-group`);
@@ -590,12 +587,11 @@
                 }
             });
 
-            // Re-apply selected classes
             const pills = document.querySelectorAll('.pill');
             pills.forEach(pill => {
                 const onClickStr = pill.getAttribute('onclick');
-                const val = onClickStr.split("'")[5]; // extract string value
-                const cat = onClickStr.split("'")[3]; // extract category
+                const val = onClickStr.split("'")[5]; 
+                const cat = onClickStr.split("'")[3]; 
                 if (userSelections[cat] && userSelections[cat].includes(val)) {
                     pill.classList.add('selected');
                 }
@@ -736,19 +732,17 @@
             loadDynamicFrame(item);
         }
 
-        // MULTI-PLATFORM PLAYER LOADER & PROTECTOR
+        // MULTI-PLATFORM PLAYER LOADER, AUTOPLAYER & ERROR SKIPPER
         function loadDynamicFrame(item) {
             stopPlayWatcher();
             const container = document.getElementById('player-frame-container');
-            container.innerHTML = ''; // wipe previous frame clean
+            container.innerHTML = ''; 
 
             if (item.platform === "youtube") {
-                // 1. Inject YouTube Target Div
                 const ytDiv = document.createElement('div');
                 ytDiv.id = "youtube-player";
                 container.appendChild(ytDiv);
 
-                // 2. Initialize YT Frame API
                 if (isYTApiReady) {
                     ytPlayer = new YT.Player('youtube-player', {
                         height: '100%',
@@ -759,38 +753,49 @@
                             'rel': 0, 
                             'modestbranding': 1,
                             'controls': 1,
-                            'iv_load_policy': 3
+                            'iv_load_policy': 3,
+                            'autoplay': 1, // Enable autoplay
+                            'mute': 1      // Required by modern browsers for successful autoplay
                         },
                         events: {
                             'onStateChange': (event) => {
                                 if (event.data === 1) startYTWatcher();
                                 else stopPlayWatcher();
+                            },
+                            'onError': (event) => {
+                                // YT Error Codes: 100, 101, 150 mean video is deleted, private, or un-embeddable
+                                if ([100, 101, 150].includes(event.data)) {
+                                    console.warn("YouTube video unavailable. Skipping to next...");
+                                    flickNextVideo();
+                                }
                             }
                         }
                     });
                 }
             } else if (item.platform === "vimeo") {
-                // 1. Inject Vimeo Native ad-free Iframe
                 const vimeoIframe = document.createElement('iframe');
                 vimeoIframe.id = "vimeo-player-frame";
-                vimeoIframe.src = `https://player.vimeo.com/video/${item.videoId}?api=1&byline=0&portrait=0&title=0&playsinline=1`;
+                // Vimeo URL containing autoplay=1 and muted=1 parameters
+                vimeoIframe.src = `https://player.vimeo.com/video/${item.videoId}?api=1&byline=0&portrait=0&title=0&playsinline=1&autoplay=1&muted=1`;
                 vimeoIframe.allow = "autoplay; fullscreen";
                 container.appendChild(vimeoIframe);
 
-                // 2. Attach Vimeo ending event handlers
                 vimeoPlayer = new Vimeo.Player(vimeoIframe);
                 
-                // Track video ending or scrub duration to safely snap close
                 vimeoPlayer.on('timeupdate', function(data) {
-                    // data.duration and data.seconds
                     if (data.duration > 0 && (data.duration - data.seconds) <= 1.5) {
                         closeDive();
                     }
                 });
+
+                // Vimeo Error Checker: catches broken/restricted video files
+                vimeoPlayer.on('error', function(error) {
+                    console.warn("Vimeo error captured. Video probably removed or restricted. Skipping:", error);
+                    flickNextVideo();
+                });
             }
         }
 
-        // YouTube specific time watcher
         function startYTWatcher() {
             stopPlayWatcher();
             playWatcherInterval = setInterval(() => {
@@ -811,8 +816,6 @@
         function closeDive() {
             stopPlayWatcher();
             document.getElementById('dive-overlay').classList.remove('active');
-            
-            // Wipe video content to guarantee audio stops playing
             document.getElementById('player-frame-container').innerHTML = '';
         }
 
