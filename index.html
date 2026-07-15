@@ -13,6 +13,8 @@
             --accent-color: #c084fc;
             --accent-hover: #d8b4fe;
             --danger-color: #f87171;
+            --btn-flick-bg: #8b5cf6;
+            --btn-flick-hover: #a78bfa;
         }
 
         body {
@@ -94,7 +96,7 @@
             color: #e5e7eb;
         }
 
-        /* 10-Option Pill Grid */
+        /* 12-Option Pill Grid */
         .pill-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -322,6 +324,36 @@
             height: 100%;
             border: 0;
         }
+
+        /* Active Viewer Toolbar containing the Flick Button */
+        .viewer-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            border-top: 1px solid #222227;
+            padding-top: 15px;
+        }
+
+        .btn-flick-next {
+            background: linear-gradient(135deg, var(--btn-flick-bg), #a78bfa);
+            color: #0c0c0e;
+            font-weight: 700;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-flick-next:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
     </style>
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
@@ -331,30 +363,32 @@
         <h1>UnLoop</h1>
         <p class="subtitle">An antidote to predictable digital loops.</p>
 
-        <!-- SCREEN 1: Deep 30-Pill Onboarding Matrix -->
+        <!-- SCREEN 1: Deep 36-Pill Onboarding Matrix -->
         <div id="screen-setup" class="screen active">
             <div class="setup-box">
                 <div class="setup-title">Step 1: Define Your Algorithms</div>
                 <div class="setup-subtitle">Select the elements that dominate your daily digital diet. Our inversion engine will analyze your choices and compile a counter-intuitive menu to broaden your perspective.</div>
                 
-                <!-- 10 MUSIC GENRES -->
+                <!-- 12 MUSIC GENRES -->
                 <div class="option-group">
                     <span class="option-label">Which music genres dominate your streaming feeds?</span>
                     <div class="pill-grid" id="music-group">
                         <button class="pill" onclick="selectItem(this, 'music', 'shoegaze')">Shoegaze & Dream-Pop</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'ambient')">Ambient Electronics</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'prog')">Progressive Rock</button>
-                        <button class="pill" onclick="selectItem(this, 'music', 'math')">Math Rock</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'metal')">Metal</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'synthwave')">Retro Synthwave</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'postrock')">Post-Rock</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'kraut')">Krautrock</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'lofi')">Lo-Fi Chill</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'folk')">Independent Folk</button>
                         <button class="pill" onclick="selectItem(this, 'music', 'pop')">Mainstream Hits & Pop</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'rock')">Rock</button>
+                        <button class="pill" onclick="selectItem(this, 'music', 'country')">Country Music</button>
                     </div>
                 </div>
 
-                <!-- 10 VIDEO CATEGORIES -->
+                <!-- 12 VIDEO CATEGORIES -->
                 <div class="option-group">
                     <span class="option-label">What video styles do you find yourself scrolling most?</span>
                     <div class="pill-grid" id="video-group">
@@ -368,10 +402,12 @@
                         <button class="pill" onclick="selectItem(this, 'video', 'crime')">True Crime & Mystery</button>
                         <button class="pill" onclick="selectItem(this, 'video', 'games')">Video Game Playthroughs</button>
                         <button class="pill" onclick="selectItem(this, 'video', 'trailers')">Movie Trailers & Promos</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'comedy')">Comedy Sketches & Stand-Up</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'restoration')">Satisfying Restoration & Repair</button>
                     </div>
                 </div>
 
-                <!-- 10 REAL-WORLD MOODS -->
+                <!-- 12 REAL-WORLD MOODS -->
                 <div class="option-group">
                     <span class="option-label">What represents your mental state when on your phone?</span>
                     <div class="pill-grid" id="mood-group">
@@ -385,6 +421,8 @@
                         <button class="pill" onclick="selectItem(this, 'mood', 'melancholic')">Melancholic & Quiet</button>
                         <button class="pill" onclick="selectItem(this, 'mood', 'restless')">Restless & Seeking Focus</button>
                         <button class="pill" onclick="selectItem(this, 'mood', 'indifferent')">Indifferent & Numb</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'exhausted')">Overworked & Exhausted</button>
+                        <button class="pill" onclick="selectItem(this, 'mood', 'uninspired')">Creative Block & Seeking Inspiration</button>
                     </div>
                 </div>
 
@@ -411,14 +449,22 @@
             <div class="embed-container">
                 <div id="youtube-player"></div>
             </div>
-            <h3 id="dive-title" style="margin-top: 15px; margin-bottom: 5px; text-align: left;">Title</h3>
-            <p id="dive-desc" style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; text-align: left;">Description</p>
+            <div class="viewer-toolbar">
+                <div style="text-align: left; max-width: 60%;">
+                    <h3 id="dive-title" style="margin: 0 0 5px 0;">Title</h3>
+                    <p id="dive-desc" style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Description</p>
+                </div>
+                <!-- Inline Channel-Flicking functionality avoiding chosen categories -->
+                <button class="btn-flick-next" id="btn-flick" onclick="flickNextVideo()">Flick to Next Antidote 🔄</button>
+            </div>
         </div>
     </div>
 
     <script>
         let ytPlayer;
         let isApiReady = false;
+        let playWatcherInterval; // Continuously calculates active video remaining duration
+        let activeCategory = ''; // Tracks if currently reading 'learn', 'laugh', or 'listen'
 
         let userSelections = { music: [], video: [], mood: [] };
         let currentFlight = { learn: null, laugh: null, listen: null };
@@ -429,12 +475,12 @@
             learn: [
                 { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Witness the complex physical machinery of massive self-playing mechanical orchestras built at the close of the 19th-century.", videoId: "L1eM9pYqS-Q", tags: ["mechanical", "tactile", "complex"] },
                 { id: 102, tag: "Learn", title: "Urban Concrete Foraging", desc: "Discover active medicinal plants and edible foliage thriving in the brickwork of historic London alleys.", videoId: "48B1_kY2sfI", tags: ["nature", "grounding", "outdoors"] },
-                { id: 103, tag: "Learn", title: "PSone Hardware Restoration", desc: "A quiet, highly detailed mechanical repair where a yellowed console is taken apart and renewed with manual instruments.", videoId: "7t4KIYOipQM", tags: ["tactile", "retro", "quiet"] },
+                { id: 103, tag: "Learn", title: "PSone Hardware Restoration", desc: "A quiet, highly detailed mechanical repair where a yellowed console is taken apart and renewed with manual instruments.", videoId: "7t4KIYOipQM", tags: ["tactile", "retro", "quiet", "restoration"] },
                 { id: 104, tag: "Learn", title: "Beautiful Chemistry Crystal Growth", desc: "High-definition scientific macro photography showcasing chemical crystallization spreading over geometric bounds.", videoId: "HSlQGFNstg0", tags: ["science", "visuals", "complex"] }
             ],
             laugh: [
-                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Creative Logic", desc: "A masterful dose of British panel comedy where brilliant writers apply intense logical focus to entirely pointless, playful tasks.", videoId: "v4YhsooE5xY", tags: ["absurdist", "wit", "creative"] },
-                { id: 202, tag: "Laugh", title: "The Art of Constructive Boredom", desc: "A humorous, deeply counter-cultural film exploring why slowing down and doing absolutely nothing is essential to intellectual health.", videoId: "32SBBSNpwSE", tags: ["parody", "mindfulness", "quirky"] }
+                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Creative Logic", desc: "A masterful dose of British panel comedy where brilliant writers apply intense logical focus to entirely pointless, playful tasks.", videoId: "v4YhsooE5xY", tags: ["absurdist", "wit", "creative", "comedy"] },
+                { id: 202, tag: "Laugh", title: "The Art of Constructive Boredom", desc: "A humorous, deeply counter-cultural film exploring why slowing down and doing absolutely nothing is essential to intellectual health.", videoId: "32SBBSNpwSE", tags: ["parody", "mindfulness", "quirky", "comedy"] }
             ],
             listen: [
                 { id: 301, tag: "Listen", title: "Moby - Long Ambient Synths", desc: "A quiet, structural soundscape designed with slowly developing synthetic waves to lower cognitive stress.", videoId: "YXO6DwiupIc", tags: ["synth", "ambient", "calming"] },
@@ -443,7 +489,6 @@
             ]
         };
 
-        // LOAD YOUTUBE API PLAYER
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('youtube-player', {
                 height: '100%',
@@ -452,20 +497,45 @@
                 playerVars: { 
                     'playsinline': 1, 
                     'rel': 0, 
-                    'modestbranding': 1 
+                    'modestbranding': 1,
+                    'controls': 1,
+                    'iv_load_policy': 3
                 },
                 events: {
-                    'onStateChange': onPlayerStateChange // Connect the event listener here!
+                    'onStateChange': onPlayerStateChange
                 }
             });
             isApiReady = true;
         }
 
-        // AUTO-CLOSE LISTENER: Bypasses YouTube's post-video recommendations completely
+        // AUTO-CLOSE TIMER: Monitors and destroys players pre-emptively prior to video endings
         function onPlayerStateChange(event) {
-            // YT.PlayerState.ENDED is represented mathematically by the number 0
-            if (event.data === 0) {
-                closeDive();
+            // YT.PlayerState.PLAYING is represented mathematically by the number 1
+            if (event.data === 1) {
+                startPlayWatcher();
+            } else {
+                stopPlayWatcher();
+            }
+        }
+
+        function startPlayWatcher() {
+            stopPlayWatcher();
+            playWatcherInterval = setInterval(() => {
+                if (ytPlayer && typeof ytPlayer.getDuration === 'function') {
+                    const duration = ytPlayer.getDuration();
+                    const currentTime = ytPlayer.getCurrentTime();
+                    
+                    // PRE-EMPTIVE ANTI-HIJACK HIT: If within 1.5 seconds of ending, snap close!
+                    if (duration > 0 && (duration - currentTime) <= 1.5) {
+                        closeDive();
+                    }
+                }
+            }, 250);
+        }
+
+        function stopPlayWatcher() {
+            if (playWatcherInterval) {
+                clearInterval(playWatcherInterval);
             }
         }
 
@@ -495,23 +565,25 @@
             remainingPool.laugh = [...masterDatabase.laugh];
             remainingPool.listen = [...masterDatabase.listen];
 
-            // Setup profile flags
+            // Setup profile flags based on selections
             const isHighlyAnalytical = userSelections.video.includes('tutorials') || userSelections.mood.includes('analytical');
             const isHighlyOverstimulated = userSelections.video.includes('memes') || userSelections.mood.includes('wired') || userSelections.mood.includes('fragmented');
             const isPassiveBored = userSelections.music.includes('pop') || userSelections.mood.includes('autopilot') || userSelections.mood.includes('indifferent');
+            const isExhaustedOrBlocked = userSelections.mood.includes('exhausted') || userSelections.mood.includes('uninspired');
+            const isTraditionalMediaUser = userSelections.music.includes('rock') || userSelections.music.includes('country');
 
             // Apply opposite-vector sort operations
-            if (isHighlyOverstimulated) {
-                remainingPool.learn.sort((a, b) => b.tags.includes("quiet") - a.tags.includes("quiet"));
+            if (isHighlyOverstimulated || isExhaustedOrBlocked) {
+                remainingPool.learn.sort((a, b) => b.tags.includes("restoration") - a.tags.includes("restoration"));
                 remainingPool.listen.sort((a, b) => b.tags.includes("nature") - a.tags.includes("nature"));
             }
 
             if (isHighlyAnalytical) {
-                remainingPool.laugh.sort((a, b) => b.tags.includes("absurdist") - a.tags.includes("absurdist"));
+                remainingPool.laugh.sort((a, b) => b.tags.includes("comedy") - a.tags.includes("comedy"));
                 remainingPool.listen.sort((a, b) => b.tags.includes("organic") - a.tags.includes("organic"));
             }
 
-            if (isPassiveBored) {
+            if (isPassiveBored || isTraditionalMediaUser) {
                 remainingPool.learn.sort((a, b) => b.tags.includes("complex") - a.tags.includes("complex"));
             }
 
@@ -570,13 +642,42 @@
             renderFlightScreen();
         }
 
+        // FLICK NEXT VIDEO IN-APP (Maintains safe counter-algorithm profile)
+        function flickNextVideo() {
+            let pool = remainingPool[activeCategory];
+            if (pool.length === 0) {
+                // Recycle the pool if they cycle all options
+                pool = [...masterDatabase[activeCategory]].filter(item => item.id !== currentFlight[activeCategory].id);
+                remainingPool[activeCategory] = pool;
+            }
+
+            const nextItem = pool.shift();
+            const oldItem = currentFlight[activeCategory];
+
+            pool.push(oldItem);
+            currentFlight[activeCategory] = nextItem;
+
+            // Load new video inside the existing player instantly
+            document.getElementById('dive-title').innerText = nextItem.title;
+            document.getElementById('dive-desc').innerText = nextItem.desc;
+            
+            if (isApiReady && ytPlayer) {
+                ytPlayer.loadVideoById(nextItem.videoId);
+            }
+
+            // Sync the flight screen behind the scenes
+            renderFlightScreen();
+        }
+
         function goBackToSetup() {
             document.getElementById('screen-flight').classList.remove('active');
             document.getElementById('screen-setup').classList.add('active');
         }
 
         function openDive(category) {
+            activeCategory = category; // Record which stream is active ('learn', 'laugh', 'listen')
             const item = currentFlight[category];
+            
             document.getElementById('dive-title').innerText = item.title;
             document.getElementById('dive-desc').innerText = item.desc;
             document.getElementById('dive-overlay').classList.add('active');
@@ -587,6 +688,7 @@
         }
 
         function closeDive() {
+            stopPlayWatcher();
             document.getElementById('dive-overlay').classList.remove('active');
             if (ytPlayer && ytPlayer.stopVideo) {
                 ytPlayer.stopVideo();
