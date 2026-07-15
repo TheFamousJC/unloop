@@ -443,14 +443,30 @@
             ]
         };
 
+        // LOAD YOUTUBE API PLAYER
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('youtube-player', {
                 height: '100%',
                 width: '100%',
                 videoId: '',
-                playerVars: { 'playsinline': 1, 'rel': 0, 'modestbranding': 1 }
+                playerVars: { 
+                    'playsinline': 1, 
+                    'rel': 0, 
+                    'modestbranding': 1 
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange // Connect the event listener here!
+                }
             });
             isApiReady = true;
+        }
+
+        // AUTO-CLOSE LISTENER: Bypasses YouTube's post-video recommendations completely
+        function onPlayerStateChange(event) {
+            // YT.PlayerState.ENDED is represented mathematically by the number 0
+            if (event.data === 0) {
+                closeDive();
+            }
         }
 
         // Handle onboarding selections across our groups
@@ -486,19 +502,16 @@
 
             // Apply opposite-vector sort operations
             if (isHighlyOverstimulated) {
-                // Oppose high-stimulus with low-speed, natural, non-digital, grounding tasks
                 remainingPool.learn.sort((a, b) => b.tags.includes("quiet") - a.tags.includes("quiet"));
                 remainingPool.listen.sort((a, b) => b.tags.includes("nature") - a.tags.includes("nature"));
             }
 
             if (isHighlyAnalytical) {
-                // Oppose logic/work fatigue with creative, absurdist humor and organic synthesis
                 remainingPool.laugh.sort((a, b) => b.tags.includes("absurdist") - a.tags.includes("absurdist"));
                 remainingPool.listen.sort((a, b) => b.tags.includes("organic") - a.tags.includes("organic"));
             }
 
             if (isPassiveBored) {
-                // Oppose comfort/boredom loops with complex science or intense mechanical marvels
                 remainingPool.learn.sort((a, b) => b.tags.includes("complex") - a.tags.includes("complex"));
             }
 
