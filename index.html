@@ -325,6 +325,39 @@
             border: 0;
         }
 
+        /* Category Header and Navigation Links styling */
+        .overlay-category-header {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        #dive-category-title {
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+
+        .category-switcher {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .category-link {
+            color: var(--accent-hover);
+            text-decoration: underline;
+            cursor: pointer;
+            margin-left: 8px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .category-link:hover {
+            color: white;
+        }
+
         /* Active Viewer Toolbar containing the Flick Button */
         .viewer-toolbar {
             display: flex;
@@ -402,7 +435,7 @@
                         <button class="pill" onclick="selectItem(this, 'video', 'crime')">True Crime & Mystery</button>
                         <button class="pill" onclick="selectItem(this, 'video', 'games')">Video Game Playthroughs</button>
                         <button class="pill" onclick="selectItem(this, 'video', 'trailers')">Movie Trailers & Promos</button>
-                        <button class="pill" onclick="selectItem(this, 'video', 'comedy')">Comedy Sketches & Stand-Up</button>
+                        <button class="pill" onclick="selectItem(this, 'video', 'absurd')">Absurd & Surreal Play</button>
                         <button class="pill" onclick="selectItem(this, 'video', 'restoration')">Satisfying Restoration & Repair</button>
                     </div>
                 </div>
@@ -446,6 +479,15 @@
     <div id="dive-overlay" class="overlay">
         <div class="overlay-content">
             <button class="btn-close" onclick="closeDive()">×</button>
+            
+            <!-- Structural Category Title and Jump Links -->
+            <div class="overlay-category-header">
+                <h2 id="dive-category-title">LEARN</h2>
+                <div class="category-switcher" id="switcher-links">
+                    <!-- Navigation links will render dynamically here -->
+                </div>
+            </div>
+
             <div class="embed-container">
                 <div id="youtube-player"></div>
             </div>
@@ -463,14 +505,13 @@
     <script>
         let ytPlayer;
         let isApiReady = false;
-        let playWatcherInterval; // Continuously calculates active video remaining duration
-        let activeCategory = ''; // Tracks if currently reading 'learn', 'laugh', or 'listen'
+        let playWatcherInterval; 
+        let activeCategory = ''; 
 
         let userSelections = { music: [], video: [], mood: [] };
         let currentFlight = { learn: null, laugh: null, listen: null };
         let remainingPool = { learn: [], laugh: [], listen: [] };
 
-        // DEEPLY CURATED HIGH-PASSION MEDIA REPOSITORY
         const masterDatabase = {
             learn: [
                 { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Witness the complex physical machinery of massive self-playing mechanical orchestras built at the close of the 19th-century.", videoId: "L1eM9pYqS-Q", tags: ["mechanical", "tactile", "complex"] },
@@ -508,9 +549,7 @@
             isApiReady = true;
         }
 
-        // AUTO-CLOSE TIMER: Monitors and destroys players pre-emptively prior to video endings
         function onPlayerStateChange(event) {
-            // YT.PlayerState.PLAYING is represented mathematically by the number 1
             if (event.data === 1) {
                 startPlayWatcher();
             } else {
@@ -525,7 +564,7 @@
                     const duration = ytPlayer.getDuration();
                     const currentTime = ytPlayer.getCurrentTime();
                     
-                    // PRE-EMPTIVE ANTI-HIJACK HIT: If within 1.5 seconds of ending, snap close!
+                    // PRE-EMPTIVE ANTI-HIJACK HIT: Snap close safely before YouTube suggestions load
                     if (duration > 0 && (duration - currentTime) <= 1.5) {
                         closeDive();
                     }
@@ -539,7 +578,6 @@
             }
         }
 
-        // Handle onboarding selections across our groups
         function selectItem(button, category, value) {
             button.classList.toggle('selected');
             if (userSelections[category].includes(value)) {
@@ -549,7 +587,6 @@
             }
         }
 
-        // TRUE COUNTER-ALGORITHM ENGINE (INVERSION METHOD)
         function buildInvertedFlight() {
             const hasMusic = userSelections.music.length > 0;
             const hasVideo = userSelections.video.length > 0;
@@ -560,19 +597,16 @@
                 return;
             }
 
-            // Fresh database allocations
             remainingPool.learn = [...masterDatabase.learn];
             remainingPool.laugh = [...masterDatabase.laugh];
             remainingPool.listen = [...masterDatabase.listen];
 
-            // Setup profile flags based on selections
             const isHighlyAnalytical = userSelections.video.includes('tutorials') || userSelections.mood.includes('analytical');
             const isHighlyOverstimulated = userSelections.video.includes('memes') || userSelections.mood.includes('wired') || userSelections.mood.includes('fragmented');
             const isPassiveBored = userSelections.music.includes('pop') || userSelections.mood.includes('autopilot') || userSelections.mood.includes('indifferent');
             const isExhaustedOrBlocked = userSelections.mood.includes('exhausted') || userSelections.mood.includes('uninspired');
             const isTraditionalMediaUser = userSelections.music.includes('rock') || userSelections.music.includes('country');
 
-            // Apply opposite-vector sort operations
             if (isHighlyOverstimulated || isExhaustedOrBlocked) {
                 remainingPool.learn.sort((a, b) => b.tags.includes("restoration") - a.tags.includes("restoration"));
                 remainingPool.listen.sort((a, b) => b.tags.includes("nature") - a.tags.includes("nature"));
@@ -587,7 +621,6 @@
                 remainingPool.learn.sort((a, b) => b.tags.includes("complex") - a.tags.includes("complex"));
             }
 
-            // Assign top recommendations
             currentFlight.learn = remainingPool.learn.shift();
             currentFlight.laugh = remainingPool.laugh.shift();
             currentFlight.listen = remainingPool.listen.shift();
@@ -642,11 +675,9 @@
             renderFlightScreen();
         }
 
-        // FLICK NEXT VIDEO IN-APP (Maintains safe counter-algorithm profile)
         function flickNextVideo() {
             let pool = remainingPool[activeCategory];
             if (pool.length === 0) {
-                // Recycle the pool if they cycle all options
                 pool = [...masterDatabase[activeCategory]].filter(item => item.id !== currentFlight[activeCategory].id);
                 remainingPool[activeCategory] = pool;
             }
@@ -657,7 +688,6 @@
             pool.push(oldItem);
             currentFlight[activeCategory] = nextItem;
 
-            // Load new video inside the existing player instantly
             document.getElementById('dive-title').innerText = nextItem.title;
             document.getElementById('dive-desc').innerText = nextItem.desc;
             
@@ -665,7 +695,6 @@
                 ytPlayer.loadVideoById(nextItem.videoId);
             }
 
-            // Sync the flight screen behind the scenes
             renderFlightScreen();
         }
 
@@ -674,10 +703,37 @@
             document.getElementById('screen-setup').classList.add('active');
         }
 
+        // Open specific Category overlay with dynamic title + links
         function openDive(category) {
-            activeCategory = category; // Record which stream is active ('learn', 'laugh', 'listen')
+            activeCategory = category; 
             const item = currentFlight[category];
             
+            // 1. Update Title in UI
+            document.getElementById('dive-category-title').innerText = category.toUpperCase();
+            
+            // 2. Build Category switcher navigation links dynamically
+            const switcher = document.getElementById('switcher-links');
+            switcher.innerHTML = 'Switch Path: ';
+            
+            const otherCategories = {
+                learn: ['laugh', 'listen'],
+                laugh: ['learn', 'listen'],
+                listen: ['learn', 'laugh']
+            };
+            
+            otherCategories[category].forEach((otherCat, index) => {
+                const link = document.createElement('span');
+                link.className = 'category-link';
+                link.innerText = otherCat.toUpperCase();
+                link.onclick = () => openDive(otherCat); // Swap directly
+                
+                switcher.appendChild(link);
+                if (index === 0) {
+                    switcher.appendChild(document.createTextNode(' | '));
+                }
+            });
+
+            // 3. Update Video parameters
             document.getElementById('dive-title').innerText = item.title;
             document.getElementById('dive-desc').innerText = item.desc;
             document.getElementById('dive-overlay').classList.add('active');
