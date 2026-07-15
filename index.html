@@ -254,6 +254,7 @@
             cursor: pointer;
             margin-top: 40px;
             transition: background 0.2s;
+            margin-right: 10px;
         }
 
         .back-button:hover {
@@ -316,7 +317,7 @@
             margin-bottom: 18px;
         }
 
-        .embed-container iframe {
+        .embed-container iframe, .embed-container div {
             position: absolute;
             top: 0;
             left: 0;
@@ -388,6 +389,8 @@
             box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
         }
     </style>
+    <!-- Load Multi-Platform APIs (Vimeo + YouTube) -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -396,8 +399,8 @@
         <h1>UnLoop</h1>
         <p class="subtitle">An antidote to predictable digital loops.</p>
 
-        <!-- SCREEN 1: Deep 36-Pill Onboarding Matrix -->
-        <div id="screen-setup" class="screen active">
+        <!-- SCREEN 1: Deep Onboarding Matrix -->
+        <div id="screen-setup" class="screen">
             <div class="setup-box">
                 <div class="setup-title">Step 1: Define Your Algorithms</div>
                 <div class="setup-subtitle">Select the elements that dominate your daily digital diet. Our inversion engine will analyze your choices and compile a counter-intuitive menu to broaden your perspective.</div>
@@ -459,7 +462,7 @@
                     </div>
                 </div>
 
-                <button class="btn-submit" onclick="buildInvertedFlight()">Build Antidote Flight →</button>
+                <button class="btn-submit" onclick="saveAndBuildFlight()">Build Antidote Flight →</button>
             </div>
         </div>
 
@@ -470,33 +473,30 @@
                 <!-- Calculated Cards Load Here -->
             </div>
             <div>
-                <button class="back-button" onclick="goBackToSetup()">← Reset Onboarding Profile</button>
+                <button class="back-button" onclick="modifyPreferences()">Modify My Routine 🛠️</button>
             </div>
         </div>
     </div>
 
-    <!-- SCREEN 3: Lightbox Player -->
+    <!-- SCREEN 3: Universal Lightbox Player (Supporting YouTube and Vimeo) -->
     <div id="dive-overlay" class="overlay">
         <div class="overlay-content">
             <button class="btn-close" onclick="closeDive()">×</button>
             
-            <!-- Structural Category Title and Jump Links -->
             <div class="overlay-category-header">
                 <h2 id="dive-category-title">LEARN</h2>
-                <div class="category-switcher" id="switcher-links">
-                    <!-- Navigation links will render dynamically here -->
-                </div>
+                <div class="category-switcher" id="switcher-links"></div>
             </div>
 
-            <div class="embed-container">
-                <div id="youtube-player"></div>
+            <div class="embed-container" id="player-frame-container">
+                <!-- Our player systems will dynamically inject their elements here -->
             </div>
+            
             <div class="viewer-toolbar">
                 <div style="text-align: left; max-width: 60%;">
                     <h3 id="dive-title" style="margin: 0 0 5px 0;">Title</h3>
                     <p id="dive-desc" style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Description</p>
                 </div>
-                <!-- Inline Channel-Flicking functionality avoiding chosen categories -->
                 <button class="btn-flick-next" id="btn-flick" onclick="flickNextVideo()">Flick to Next Antidote 🔄</button>
             </div>
         </div>
@@ -504,7 +504,8 @@
 
     <script>
         let ytPlayer;
-        let isApiReady = false;
+        let vimeoPlayer;
+        let isYTApiReady = false;
         let playWatcherInterval; 
         let activeCategory = ''; 
 
@@ -512,71 +513,40 @@
         let currentFlight = { learn: null, laugh: null, listen: null };
         let remainingPool = { learn: [], laugh: [], listen: [] };
 
+        // MIXED HIGH-QUALITY PLATFORM DATABASE (YouTube + ad-free Vimeo)
         const masterDatabase = {
             learn: [
-                { id: 101, tag: "Learn", title: "1890s Giant Orchestrions", desc: "Witness the complex physical machinery of massive self-playing mechanical orchestras built at the close of the 19th-century.", videoId: "L1eM9pYqS-Q", tags: ["mechanical", "tactile", "complex"] },
-                { id: 102, tag: "Learn", title: "Urban Concrete Foraging", desc: "Discover active medicinal plants and edible foliage thriving in the brickwork of historic London alleys.", videoId: "48B1_kY2sfI", tags: ["nature", "grounding", "outdoors"] },
-                { id: 103, tag: "Learn", title: "PSone Hardware Restoration", desc: "A quiet, highly detailed mechanical repair where a yellowed console is taken apart and renewed with manual instruments.", videoId: "7t4KIYOipQM", tags: ["tactile", "retro", "quiet", "restoration"] },
-                { id: 104, tag: "Learn", title: "Beautiful Chemistry Crystal Growth", desc: "High-definition scientific macro photography showcasing chemical crystallization spreading over geometric bounds.", videoId: "HSlQGFNstg0", tags: ["science", "visuals", "complex"] }
+                { id: 101, platform: "vimeo", tag: "Learn", title: "Cymatics - Visualizing Sound", desc: "Watch how physical sound frequencies shape and crystallize physical matters like water, sand, and liquid. Beautifully recorded on high-speed Vimeo.", videoId: "111593581", tags: ["science", "visuals", "complex"] },
+                { id: 102, platform: "youtube", tag: "Learn", title: "1890s Giant Orchestrions", desc: "Witness the complex physical machinery of massive self-playing mechanical orchestras built at the close of the 19th-century.", videoId: "L1eM9pYqS-Q", tags: ["mechanical", "tactile", "complex"] },
+                { id: 103, platform: "youtube", tag: "Learn", title: "Urban Concrete Foraging", desc: "Discover active medicinal plants and edible foliage thriving in the brickwork of historic London alleys.", videoId: "48B1_kY2sfI", tags: ["nature", "grounding", "outdoors"] },
+                { id: 104, platform: "vimeo", tag: "Learn", title: "The Art of Slow Watchmaking", desc: "An ad-free, stunning documentary tracking an old Swiss artisan hand-crafting complex mechanical gear components.", videoId: "81347895", tags: ["tactile", "quiet", "restoration"] }
             ],
             laugh: [
-                { id: 201, tag: "Laugh", title: "Taskmaster - Absurd Creative Logic", desc: "A masterful dose of British panel comedy where brilliant writers apply intense logical focus to entirely pointless, playful tasks.", videoId: "v4YhsooE5xY", tags: ["absurdist", "wit", "creative", "comedy"] },
-                { id: 202, tag: "Laugh", title: "The Art of Constructive Boredom", desc: "A humorous, deeply counter-cultural film exploring why slowing down and doing absolutely nothing is essential to intellectual health.", videoId: "32SBBSNpwSE", tags: ["parody", "mindfulness", "quirky", "comedy"] }
+                { id: 201, platform: "youtube", tag: "Laugh", title: "Taskmaster - Absurd Creative Logic", desc: "A masterful dose of British panel comedy where brilliant writers apply intense logical focus to entirely pointless, playful tasks.", videoId: "v4YhsooE5xY", tags: ["absurdist", "wit", "creative", "comedy"] },
+                { id: 202, platform: "vimeo", tag: "Laugh", title: "The Absurd Box-Man Trick", desc: "A creative, wordless, short artistic physical performance about a man and his cardboard box stack.", videoId: "24673901", tags: ["absurdist", "wit", "quirky", "comedy"] }
             ],
             listen: [
-                { id: 301, tag: "Listen", title: "Moby - Long Ambient Synths", desc: "A quiet, structural soundscape designed with slowly developing synthetic waves to lower cognitive stress.", videoId: "YXO6DwiupIc", tags: ["synth", "ambient", "calming"] },
-                { id: 302, tag: "Listen", title: "Modular Synthesizer Botany", desc: "Lush ambient waveforms modulated in real-time by feeding electric micro-currents through living oyster mushrooms.", videoId: "916Iva8llvE", tags: ["organic", "synth", "unusual"] },
-                { id: 303, tag: "Listen", title: "Wilderness Log Cabin ASMR", desc: "Escape synthesized environments completely. Enjoy the acoustic details of snow falling, wood carving, and natural crackling fires.", videoId: "sG5fSCelTfQ", tags: ["nature", "quiet", "acoustic"] }
+                { id: 301, platform: "vimeo", tag: "Listen", title: "Infinite Forest Canopy", desc: "Deep cinematic aerial visuals over mist-covered pine forests layered with high-quality binaural mountain winds.", videoId: "22340590", tags: ["nature", "quiet", "ambient"] },
+                { id: 302, platform: "youtube", tag: "Listen", title: "Moby - Long Ambient Synths", desc: "A quiet, structural soundscape designed with slowly developing synthetic waves to lower cognitive stress.", videoId: "YXO6DwiupIc", tags: ["synth", "ambient", "calming"] },
+                { id: 303, platform: "youtube", tag: "Listen", title: "Modular Synthesizer Botany", desc: "Lush ambient waveforms modulated in real-time by feeding electric micro-currents through living oyster mushrooms.", videoId: "916Iva8llvE", tags: ["organic", "synth", "unusual"] }
             ]
         };
 
+        // Initialize Youtube Player frame
         function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('youtube-player', {
-                height: '100%',
-                width: '100%',
-                videoId: '',
-                playerVars: { 
-                    'playsinline': 1, 
-                    'rel': 0, 
-                    'modestbranding': 1,
-                    'controls': 1,
-                    'iv_load_policy': 3
-                },
-                events: {
-                    'onStateChange': onPlayerStateChange
-                }
-            });
-            isApiReady = true;
+            isYTApiReady = true;
         }
 
-        function onPlayerStateChange(event) {
-            if (event.data === 1) {
-                startPlayWatcher();
+        // AUTO-DETECTION SYSTEM (localStorage memory loop)
+        window.onload = function() {
+            const savedSelections = localStorage.getItem('unloop_preferences');
+            if (savedSelections) {
+                userSelections = JSON.parse(savedSelections);
+                buildInvertedFlight(true); // Jump straight to cards
             } else {
-                stopPlayWatcher();
+                document.getElementById('screen-setup').classList.add('active'); // Load onboarding
             }
-        }
-
-        function startPlayWatcher() {
-            stopPlayWatcher();
-            playWatcherInterval = setInterval(() => {
-                if (ytPlayer && typeof ytPlayer.getDuration === 'function') {
-                    const duration = ytPlayer.getDuration();
-                    const currentTime = ytPlayer.getCurrentTime();
-                    
-                    // PRE-EMPTIVE ANTI-HIJACK HIT: Snap close safely before YouTube suggestions load
-                    if (duration > 0 && (duration - currentTime) <= 1.5) {
-                        closeDive();
-                    }
-                }
-            }, 250);
-        }
-
-        function stopPlayWatcher() {
-            if (playWatcherInterval) {
-                clearInterval(playWatcherInterval);
-            }
-        }
+        };
 
         function selectItem(button, category, value) {
             button.classList.toggle('selected');
@@ -587,7 +557,8 @@
             }
         }
 
-        function buildInvertedFlight() {
+        // SAVE PREFERENCES & BUILD FLIGHT
+        function saveAndBuildFlight() {
             const hasMusic = userSelections.music.length > 0;
             const hasVideo = userSelections.video.length > 0;
             const hasMood = userSelections.mood.length > 0;
@@ -597,6 +568,42 @@
                 return;
             }
 
+            // Save to browser memory
+            localStorage.setItem('unloop_preferences', JSON.stringify(userSelections));
+            buildInvertedFlight(false);
+        }
+
+        function modifyPreferences() {
+            // Un-hide setup, load selections
+            document.getElementById('screen-flight').classList.remove('active');
+            document.getElementById('screen-setup').classList.add('active');
+
+            // Set visual pill selections
+            const categories = ['music', 'video', 'mood'];
+            categories.forEach(cat => {
+                const group = document.getElementById(`${cat}-group`);
+                if (group) {
+                    const buttons = group.getElementsByTagName('button');
+                    for (let btn of buttons) {
+                        btn.classList.remove('selected');
+                    }
+                }
+            });
+
+            // Re-apply selected classes
+            const pills = document.querySelectorAll('.pill');
+            pills.forEach(pill => {
+                const onClickStr = pill.getAttribute('onclick');
+                const val = onClickStr.split("'")[5]; // extract string value
+                const cat = onClickStr.split("'")[3]; // extract category
+                if (userSelections[cat] && userSelections[cat].includes(val)) {
+                    pill.classList.add('selected');
+                }
+            });
+        }
+
+        // TRUE COUNTER-ALGORITHM ENGINE (INVERSION METHOD)
+        function buildInvertedFlight(isAutoload) {
             remainingPool.learn = [...masterDatabase.learn];
             remainingPool.laugh = [...masterDatabase.laugh];
             remainingPool.listen = [...masterDatabase.listen];
@@ -691,27 +698,16 @@
             document.getElementById('dive-title').innerText = nextItem.title;
             document.getElementById('dive-desc').innerText = nextItem.desc;
             
-            if (isApiReady && ytPlayer) {
-                ytPlayer.loadVideoById(nextItem.videoId);
-            }
-
+            loadDynamicFrame(nextItem);
             renderFlightScreen();
         }
 
-        function goBackToSetup() {
-            document.getElementById('screen-flight').classList.remove('active');
-            document.getElementById('screen-setup').classList.add('active');
-        }
-
-        // Open specific Category overlay with dynamic title + links
         function openDive(category) {
             activeCategory = category; 
             const item = currentFlight[category];
             
-            // 1. Update Title in UI
             document.getElementById('dive-category-title').innerText = category.toUpperCase();
             
-            // 2. Build Category switcher navigation links dynamically
             const switcher = document.getElementById('switcher-links');
             switcher.innerHTML = 'Switch Path: ';
             
@@ -725,7 +721,7 @@
                 const link = document.createElement('span');
                 link.className = 'category-link';
                 link.innerText = otherCat.toUpperCase();
-                link.onclick = () => openDive(otherCat); // Swap directly
+                link.onclick = () => openDive(otherCat);
                 
                 switcher.appendChild(link);
                 if (index === 0) {
@@ -733,22 +729,97 @@
                 }
             });
 
-            // 3. Update Video parameters
             document.getElementById('dive-title').innerText = item.title;
             document.getElementById('dive-desc').innerText = item.desc;
             document.getElementById('dive-overlay').classList.add('active');
             
-            if (isApiReady && ytPlayer) {
-                ytPlayer.loadVideoById(item.videoId);
+            loadDynamicFrame(item);
+        }
+
+        // MULTI-PLATFORM PLAYER LOADER & PROTECTOR
+        function loadDynamicFrame(item) {
+            stopPlayWatcher();
+            const container = document.getElementById('player-frame-container');
+            container.innerHTML = ''; // wipe previous frame clean
+
+            if (item.platform === "youtube") {
+                // 1. Inject YouTube Target Div
+                const ytDiv = document.createElement('div');
+                ytDiv.id = "youtube-player";
+                container.appendChild(ytDiv);
+
+                // 2. Initialize YT Frame API
+                if (isYTApiReady) {
+                    ytPlayer = new YT.Player('youtube-player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: item.videoId,
+                        playerVars: { 
+                            'playsinline': 1, 
+                            'rel': 0, 
+                            'modestbranding': 1,
+                            'controls': 1,
+                            'iv_load_policy': 3
+                        },
+                        events: {
+                            'onStateChange': (event) => {
+                                if (event.data === 1) startYTWatcher();
+                                else stopPlayWatcher();
+                            }
+                        }
+                    });
+                }
+            } else if (item.platform === "vimeo") {
+                // 1. Inject Vimeo Native ad-free Iframe
+                const vimeoIframe = document.createElement('iframe');
+                vimeoIframe.id = "vimeo-player-frame";
+                vimeoIframe.src = `https://player.vimeo.com/video/${item.videoId}?api=1&byline=0&portrait=0&title=0&playsinline=1`;
+                vimeoIframe.allow = "autoplay; fullscreen";
+                container.appendChild(vimeoIframe);
+
+                // 2. Attach Vimeo ending event handlers
+                vimeoPlayer = new Vimeo.Player(vimeoIframe);
+                
+                // Track video ending or scrub duration to safely snap close
+                vimeoPlayer.on('timeupdate', function(data) {
+                    // data.duration and data.seconds
+                    if (data.duration > 0 && (data.duration - data.seconds) <= 1.5) {
+                        closeDive();
+                    }
+                });
             }
+        }
+
+        // YouTube specific time watcher
+        function startYTWatcher() {
+            stopPlayWatcher();
+            playWatcherInterval = setInterval(() => {
+                if (ytPlayer && typeof ytPlayer.getDuration === 'function') {
+                    const duration = ytPlayer.getDuration();
+                    const currentTime = ytPlayer.getCurrentTime();
+                    if (duration > 0 && (duration - currentTime) <= 1.5) {
+                        closeDive();
+                    }
+                }
+            }, 250);
+        }
+
+        function stopPlayWatcher() {
+            if (playWatcherInterval) clearInterval(playWatcherInterval);
         }
 
         function closeDive() {
             stopPlayWatcher();
             document.getElementById('dive-overlay').classList.remove('active');
-            if (ytPlayer && ytPlayer.stopVideo) {
-                ytPlayer.stopVideo();
-            }
+            
+            // Wipe video content to guarantee audio stops playing
+            document.getElementById('player-frame-container').innerHTML = '';
+        }
+
+        function goBackToSetup() {
+            localStorage.removeItem('unloop_preferences');
+            document.getElementById('screen-flight').classList.remove('active');
+            document.getElementById('screen-setup').classList.add('active');
         }
     </script>
 </body>
